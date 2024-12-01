@@ -1,3 +1,4 @@
 *.rar filter=lfs diff=lfs merge=lfs -text
 progress-report/Tuan[[:space:]]2/dashboard.rar filter=lfs diff=lfs merge=lfs -text
 src/dashboard.rar filter=lfs diff=lfs merge=lfs -text
+src/client.rar filter=lfs diff=lfs merge=lfs -text
