@@ -1,0 +1,53 @@
+/* SecondaryHeader.css */
+header {
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+}
+
+header a {
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+header a:hover {
+    color: #1d4ed8;
+}
+
+.secondary-header {
+    position: relative;
+    /* Đảm bảo nó nằm dưới Header */
+    z-index: 10;
+    /* Nên thấp hơn Header nếu Header có z-index cao */
+    background-color: #f3f4f6;
+    /* Tùy chỉnh màu nền để dễ nhìn */
+}
+
+header {
+    position: relative;
+    /* Không cho phép đè lên */
+    z-index: 10;
+    /* Đảm bảo thứ tự lớp */
+    margin-top: 0;
+    /* Đặt cách đều với phần trên */
+}
+
+header {
+    position: fixed;
+    top: 60px;
+    /* Khoảng cách chính xác dựa trên chiều cao của Header */
+    width: 100%;
+    z-index: 40;
+    /* Đặt giá trị thấp hơn Header */
+}
+
+header {
+    z-index: 100;
+    /* Cao hơn Header */
+    position: relative;
+    /* Đảm bảo nằm trong dòng luồng bình thường */
+}
+
+.secondary-header {
+    top: 64px;
+    /* Giảm khoảng cách top để không che quá nhiều */
+}
