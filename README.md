@@ -1,4 +1,4 @@
-# cn-da21ttc-phamdangkhoa-REACT-NODEJS--Raovatbatdongsan_Hailua
+# cn-da21ttc-phamdangkhoa-raovatbatdongsan_hailua-react_nodejs
 
  # Đề tài: XÂY DỰNG WEBSITE RAO VẶT BẤT ĐỘNG SẢN HAI LÚA TRÀ VINH
  # Tên sinh viên thực hiện đề tài: Phạm Đăng Khoa
@@ -17,3 +17,7 @@
 # Tuần 3: Báo cáo: Cơ sở dữ liệu và API backend hoạt động ổn định.
 # Tuần 4: Báo cáo: + Tích hợp frontend -backend hoàn chỉnh và kiểm thử cơ bản.
 #                  + Viết báo cáo đầy đủ theo mẫu quy định
+# Tuần 5: Báo cáo: + Hoàn thành sản phẩm website
+#                  + Hoàn thành quyển báo cáo
+#                  + Hoàn thành slide báo cáo
+#                  + Hoàn thành poster
