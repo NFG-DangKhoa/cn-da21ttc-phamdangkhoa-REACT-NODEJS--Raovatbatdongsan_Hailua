@@ -43,7 +43,7 @@ const Header = () => {
                         <span>Tin tức</span>
                     </Link>
                     {userRole === 'user' && (
-                        <Link to="/payment-form" className="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 flex items-center space-x-2 text-base">
+                        <Link to="/create-bds" className="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 flex items-center space-x-2 text-base">
                             <PencilAltIcon className="h-5 w-5" />
                             <span>Đăng tin</span>
                         </Link>
