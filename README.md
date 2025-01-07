@@ -1,4 +1,4 @@
-# cn-da21ttc-phamdangkhoa-REACT-NODEJS--Raovatbatdongsan_Hailua
+# cn-da21ttc-phamdangkhoa-raovatbatdongsan_hailua-react_nodejs
 
  # Đề tài: XÂY DỰNG WEBSITE RAO VẶT BẤT ĐỘNG SẢN HAI LÚA TRÀ VINH
  # Tên sinh viên thực hiện đề tài: Phạm Đăng Khoa
