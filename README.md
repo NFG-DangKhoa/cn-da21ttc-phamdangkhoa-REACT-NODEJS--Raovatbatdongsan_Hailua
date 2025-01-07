@@ -17,3 +17,7 @@
 # Tuần 3: Báo cáo: Cơ sở dữ liệu và API backend hoạt động ổn định.
 # Tuần 4: Báo cáo: + Tích hợp frontend -backend hoàn chỉnh và kiểm thử cơ bản.
 #                  + Viết báo cáo đầy đủ theo mẫu quy định
+# Tuần 5: Báo cáo: + Hoàn thành sản phẩm website
+#                  + Hoàn thành quyển báo cáo
+#                  + Hoàn thành slide báo cáo
+#                  + Hoàn thành poster
