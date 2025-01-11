@@ -112,10 +112,36 @@ const deleteBDS = async (req, res) => {
     }
 };
 
+// Hàm lấy thông tin người bán dựa vào bds_id
+const getSellerByBdsId = async (req, res) => {
+    try {
+        const { bds_id } = req.params;
+
+        // Tìm transaction có bds_id tương ứng
+        const transaction = await Transaction.findOne({ bds_id }).lean();
+
+        if (!transaction || !transaction.seller_id) {
+            return res.status(404).json({ message: 'Không tìm thấy thông tin người bán cho bất động sản này' });
+        }
+
+        // Tìm thông tin người bán dựa vào seller_id
+        const seller = await Seller.findById(transaction.seller_id).lean();
+
+        if (!seller) {
+            return res.status(404).json({ message: 'Người bán không tồn tại' });
+        }
+
+        res.status(200).json(seller);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getAllBDS,
     getBDSByType,
     updateBDS,
     deleteBDS,
     getBdsCount,
+    getSellerByBdsId, // Thêm hàm này
 };

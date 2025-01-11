@@ -12,6 +12,7 @@ const moment = require('moment');
 const config = require('config');
 const querystring = require('querystring');
 let crypto = require("crypto");
+const { sendOrderConfirmationEmail } = require('../../controllers/Gmail/emailController'); // Import hàm gửi email
 
 
 
@@ -36,6 +37,27 @@ router.get('/refund', function (req, res, next) {
     let desc = 'Hoan tien GD thanh toan';
     res.render('refund', { title: 'Hoàn tiền giao dịch thanh toán' })
 });
+
+router.post('/save_email', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Kiểm tra email
+        if (!email) {
+            return res.status(400).json({ message: 'Email không hợp lệ' });
+        }
+
+        // Lưu email vào biến tạm
+        savedEmail = email;
+
+        return res.status(200).json({ message: 'Email đã được lưu thành công' });
+    } catch (error) {
+        console.error("Lỗi khi lưu email:", error);
+        return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình lưu email' });
+    }
+});
+
+
 
 
 router.post('/create_payment_url', function (req, res, next) {
@@ -95,9 +117,11 @@ router.post('/create_payment_url', function (req, res, next) {
 
 });
 
-router.get('/vnpay_return', function (req, res, next) {
-    let vnp_Params = req.query;
 
+
+// GET route để xử lý phản hồi từ VNPay
+router.get('/vnpay_return', async function (req, res, next) {
+    let vnp_Params = req.query;
     let secureHash = vnp_Params['vnp_SecureHash'];
 
     // Xóa các tham số không cần kiểm tra chữ ký
@@ -111,32 +135,45 @@ router.get('/vnpay_return', function (req, res, next) {
     let secretKey = config.get('vnp_HashSecret');
 
     let querystring = require('qs');
-    let signData = querystring.stringify(vnp_Params, { encode: false });
     let crypto = require("crypto");
+    let signData = querystring.stringify(vnp_Params, { encode: false });
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex");
 
     if (secureHash === signed) {
         // Kiểm tra mã phản hồi
         if (vnp_Params['vnp_ResponseCode'] === '00') {
-            res.json(vnp_Params); // Trả về toàn bộ thông số dưới dạng JSON
+            // Kiểm tra xem đã lưu email chưa
+            if (!savedEmail) {
+                return res.status(400).json({ message: 'Email chưa được lưu' });
+            }
+
+            const orderDetails = JSON.stringify(vnp_Params, null, 2); // Định dạng JSON cho chi tiết đơn hàng
+
+            // Gọi hàm gửi email và lấy kết quả
+            const emailResponse = await sendOrderConfirmationEmail({ email: savedEmail, orderDetails });
+
+            // Trả về kết quả sau khi gửi email thành công
+            return res.status(emailResponse.status).json({ message: emailResponse.message });
         } else {
-            res.json({ code: vnp_Params['vnp_ResponseCode'], message: 'Transaction failed' });
+            return res.json({ code: vnp_Params['vnp_ResponseCode'], message: 'Transaction failed' });
         }
     } else {
-        res.json({ code: '97', message: 'Invalid signature' });
+        return res.json({ code: '97', message: 'Invalid signature' });
     }
 });
 
-// Hàm sắp xếp object theo thứ tự alphabet
+
+// Hàm sắp xếp các tham số
 function sortObject(obj) {
-    let sorted = {};
-    let keys = Object.keys(obj).sort();
-    keys.forEach(key => {
+    const sorted = {};
+    const keys = Object.keys(obj).sort();
+    keys.forEach((key) => {
         sorted[key] = obj[key];
     });
     return sorted;
 }
+
 
 
 router.get('/vnpay_ipn', function (req, res, next) {

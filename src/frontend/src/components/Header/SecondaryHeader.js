@@ -3,20 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { FaChevronDown, FaCheckSquare, FaRegSquare } from 'react-icons/fa';
 
 const SecondaryHeader = () => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [openDropdown, setOpenDropdown] = useState(null); // Trạng thái để theo dõi dropdown mở
     const [selectedItem, setSelectedItem] = useState('Tất Cả');
-    const [isDropdownOpenSize, setIsDropdownOpenSize] = useState(false);
     const [selectedSize, setSelectedSize] = useState('Tất Cả');
-    const [isDropdownOpenTransaction, setIsDropdownOpenTransaction] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState('Tất Cả');
-    const [isDropdownOpenPrice, setIsDropdownOpenPrice] = useState(false);
     const [selectedPrice, setSelectedPrice] = useState('Tất Cả');
 
     const navigate = useNavigate();
     const [isPending, startTransition] = useTransition();
 
-    const toggleDropdown = (setter) => {
-        setter((prev) => !prev);
+    const toggleDropdown = (dropdown) => {
+        setOpenDropdown((prev) => (prev === dropdown ? null : dropdown));
     };
 
     const handleNavigate = (path, item, setter) => {
@@ -59,22 +56,21 @@ const SecondaryHeader = () => {
     return (
         <header className="bg-gradient-to-t from-blue-100 to-blue-300 text-gray-800 py-3 border-b-4 border-gray-300 shadow-md fixed top-16 left-0 w-full z-40">
             <div className="container mx-auto flex items-center justify-between">
-                {/* Dropdowns */}
                 <div className="ml-32 flex space-x-4">
                     {/* Loại bất động sản */}
                     <div className="relative">
                         <button
                             className="bg-white text-gray-700 text-sm px-4 py-2 rounded-lg shadow hover:shadow-lg flex flex-col items-start space-y-1"
-                            onClick={() => toggleDropdown(setIsDropdownOpen)}
+                            onClick={() => toggleDropdown('loai')}
                         >
                             <div className="flex items-center space-x-2">
                                 <span>Loại</span>
-                                <FaChevronDown className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                                <FaChevronDown
+                                    className={`transition-transform ${openDropdown === 'loai' ? 'rotate-180' : ''}`}
+                                />
                             </div>
-                            {/* Chữ "Tất Cả" màu đỏ dưới tên nút */}
                             <div className="mt-1 text-sm text-red-500">{selectedItem}</div>
-
-                            {isDropdownOpen && (
+                            {openDropdown === 'loai' && (
                                 <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
                                     {dropdownItems.map((item) => (
                                         <li
@@ -93,29 +89,30 @@ const SecondaryHeader = () => {
                                 </ul>
                             )}
                         </button>
-
-
                     </div>
 
                     {/* Giao dịch */}
                     <div className="relative">
                         <button
                             className="bg-white text-gray-700 text-sm px-4 py-2 rounded-lg shadow hover:shadow-lg flex flex-col items-start space-y-1"
-                            onClick={() => toggleDropdown(setIsDropdownOpenTransaction)}
+                            onClick={() => toggleDropdown('giaoDich')}
                         >
-
                             <div className="flex items-center space-x-2">
                                 <span>Giao dịch</span>
-                                <FaChevronDown className={`transition-transform ${isDropdownOpenTransaction ? 'rotate-180' : ''}`} />
+                                <FaChevronDown
+                                    className={`transition-transform ${openDropdown === 'giaoDich' ? 'rotate-180' : ''}`}
+                                />
                             </div>
-                            <div className="mt-2 text-sm text-red-500">{selectedTransaction}</div> {/* Chữ "Tất Cả" màu đỏ */}
-                            {isDropdownOpenTransaction && (
+                            <div className="mt-2 text-sm text-red-500">{selectedTransaction}</div>
+                            {openDropdown === 'giaoDich' && (
                                 <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
                                     {transactionItems.map((item) => (
                                         <li
                                             key={item.label}
                                             className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center space-x-2"
-                                            onClick={() => handleNavigate(item.path, item.label, setSelectedTransaction)}
+                                            onClick={() =>
+                                                handleNavigate(item.path, item.label, setSelectedTransaction)
+                                            }
                                         >
                                             {selectedTransaction === item.label ? (
                                                 <FaCheckSquare className="text-red-500" />
@@ -128,21 +125,22 @@ const SecondaryHeader = () => {
                                 </ul>
                             )}
                         </button>
-
                     </div>
 
                     {/* Diện tích */}
                     <div className="relative">
                         <button
                             className="bg-white text-gray-700 text-sm px-4 py-2 rounded-lg shadow hover:shadow-lg flex flex-col items-start space-y-1"
-                            onClick={() => toggleDropdown(setIsDropdownOpenSize)}
+                            onClick={() => toggleDropdown('dienTich')}
                         >
                             <div className="flex items-center space-x-2">
                                 <span>Diện tích</span>
-                                <FaChevronDown className={`transition-transform ${isDropdownOpenSize ? 'rotate-180' : ''}`} />
+                                <FaChevronDown
+                                    className={`transition-transform ${openDropdown === 'dienTich' ? 'rotate-180' : ''}`}
+                                />
                             </div>
-                            <div className="mt-2 text-sm text-red-500">{selectedSize}</div> {/* Chữ "Tất Cả" màu đỏ */}
-                            {isDropdownOpenSize && (
+                            <div className="mt-2 text-sm text-red-500">{selectedSize}</div>
+                            {openDropdown === 'dienTich' && (
                                 <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
                                     {sizeItems.map((item) => (
                                         <li
@@ -161,21 +159,22 @@ const SecondaryHeader = () => {
                                 </ul>
                             )}
                         </button>
-
                     </div>
 
                     {/* Khoảng giá */}
                     <div className="relative">
                         <button
                             className="bg-white text-gray-700 text-sm px-4 py-2 rounded-lg shadow hover:shadow-lg flex flex-col items-start space-y-1"
-                            onClick={() => toggleDropdown(setIsDropdownOpenPrice)}
+                            onClick={() => toggleDropdown('gia')}
                         >
                             <div className="flex items-center space-x-2">
                                 <span>Khoảng giá</span>
-                                <FaChevronDown className={`transition-transform ${isDropdownOpenPrice ? 'rotate-180' : ''}`} />
+                                <FaChevronDown
+                                    className={`transition-transform ${openDropdown === 'gia' ? 'rotate-180' : ''}`}
+                                />
                             </div>
-                            <div className="mt-2 text-sm text-red-500">{selectedPrice}</div> {/* Chữ "Tất Cả" màu đỏ */}
-                            {isDropdownOpenPrice && (
+                            <div className="mt-2 text-sm text-red-500">{selectedPrice}</div>
+                            {openDropdown === 'gia' && (
                                 <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
                                     {priceItems.map((item) => (
                                         <li

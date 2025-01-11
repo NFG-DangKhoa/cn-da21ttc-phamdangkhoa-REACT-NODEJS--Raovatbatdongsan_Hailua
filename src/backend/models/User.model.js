@@ -2,23 +2,19 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Define the user schema with the 'role' field
 const userSchema = new Schema({
-    name: { type: String, required: true },
-    email: { type: String, unique: true, required: true },
-    password: { type: String, required: true },
+    name: { type: String, required: true },           // Tên người dùng
+    email: { type: String, unique: true, required: true },  // Email (duy nhất)
+    password: { type: String, required: true },       // Mật khẩu
     role: {
         type: String,
-        enum: ['admin', 'user'],  // Allow only these three roles
-        default: 'user'  // Default role is 'buyer'
+        enum: ['admin', 'user'],  // Vai trò người dùng (admin hoặc user)
+        default: 'user'           // Vai trò mặc định là user
     },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },  // Ngày tạo
+    updatedAt: { type: Date, default: Date.now },  // Ngày cập nhật
+    favorites: [{ type: Schema.Types.ObjectId, ref: 'Favorite' }]  // Mối quan hệ với bảng Favorite
 });
 
-// Create the model based on the schema
 const User = mongoose.model('User', userSchema);
-
-// Export the model
 module.exports = User;
-

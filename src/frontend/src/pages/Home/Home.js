@@ -95,19 +95,26 @@ const Home = () => {
     const remainingForRent = forRentCount - displayedBdsForRent.length;
     const remainingFeatured = featuredCount - displayedBdsFeatured.length; // New line to track remaining featured properties
 
-    const timeAgo = (timestamp) => {
+    const timeAgo = (timestamp, updatedAt) => {
         const now = new Date();
         const postedAt = new Date(timestamp);
+        const lastUpdated = new Date(updatedAt);
+
         const diffInSeconds = Math.floor((now - postedAt) / 1000);
+        const updatedDiffInSeconds = Math.floor((now - lastUpdated) / 1000);
+
         const diffInMinutes = Math.floor(diffInSeconds / 60);
         const diffInHours = Math.floor(diffInMinutes / 60);
         const diffInDays = Math.floor(diffInHours / 24);
 
+        if (updatedDiffInSeconds < 60) return 'Vừa cập nhật'; // Nếu vừa được cập nhật
         if (diffInMinutes < 1) return 'Vừa xong';
         if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
         if (diffInHours < 24) return `${diffInHours} giờ trước`;
         return `${diffInDays} ngày trước`;
     };
+
+
     return (
         <div className="p-6 mt-48 flex flex-col items-center">
             {/* Đoạn văn bản tìm kiếm bất động sản */}
@@ -157,75 +164,92 @@ const Home = () => {
                     </ul>
                 </div>
             </div>
+
             <div className="mt-20 w-full max-w-screen-xl">
                 {/* Bất động sản nổi bật */}
                 <h2 className="text-xl font-medium mb-6 flex justify-between items-center">
                     <span className="text-3xl pl-20 font-sans">Bất động sản nổi bật</span>
+                    {displayedBdsFeatured.length < featuredCount && !showAllFeatured && (
+                        <button className="text-blue-500" onClick={() => setShowAllFeatured(true)}>
+                            <span className="pr-40">
+                                <Link to="/bdsFeatured">
+                                    Xem thêm {remainingFeatured} bất động sản nổi bật
+                                    <FontAwesomeIcon icon={faAngleRight} className="mr-2 text-blue-500" />
+                                </Link>
+                            </span>
+                        </button>
+                    )}
                 </h2>
                 <div className="flex flex-wrap justify-center gap-x-5 gap-y-6">
                     {bdsFeatured.length > 0 ? (
                         displayedBdsFeatured.map((bds) => (
-                            <div
+                            <Link
+                                to={`/bdsDetail/${bds._id}`}
+                                state={{ bds }}
                                 key={bds._id}
                                 className="p-0 border rounded-lg shadow transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-gray-500 w-[260px] relative"
                             >
-                                {/* Huy hiệu bookmark với ngôi sao */}
-                                <div className="absolute top-2 left-2 w-12 h-12 flex items-center justify-center z-20">
-                                    <FontAwesomeIcon
-                                        icon={faBookmark}
-                                        className="text-xl top-[20%] left-[20%] w-8 h-8"
-                                        style={{
-                                            maskImage: 'linear-gradient(to bottom, #FFF9C4, #FFEB3B)',  // Màu vàng nhẹ từ trên xuống dưới
-                                            WebkitMaskImage: 'linear-gradient(to bottom, #FFF9C4, #FFEB3B)',  // Đảm bảo tương thích trên các trình duyệt khác nhau
-                                            color: 'yellow '
-                                        }}
-                                    />
-                                    <FontAwesomeIcon
-                                        icon={faStar}
-                                        className="absolute text-yellow-700 text-l top-[35%] left-[32%]" // Tăng kích thước và điều chỉnh vị trí
-                                    />
-                                </div>
-
-                                {/* Vùng chứa ảnh */}
-                                {bds.images && bds.images.length > 0 ? (
-                                    <div className="overflow-hidden relative">
-                                        <img
-                                            src={bds.images[0]}
-                                            alt={`Hình ảnh của ${bds.title}`}
-                                            className="rounded-lg w-full h-48 object-cover"
+                                {/* Nội dung thẻ */}
+                                <div>
+                                    {/* Huy hiệu bookmark */}
+                                    <div className="absolute top-2 left-2 w-12 h-12 flex items-center justify-center z-20">
+                                        <FontAwesomeIcon
+                                            icon={faBookmark}
+                                            className="text-xl top-[20%] left-[20%] w-8 h-8"
+                                            style={{
+                                                maskImage: 'linear-gradient(to bottom, #FFF9C4, #FFEB3B)',
+                                                WebkitMaskImage: 'linear-gradient(to bottom, #FFF9C4, #FFEB3B)',
+                                                color: 'yellow',
+                                            }}
                                         />
-                                        {/* Thời gian hiển thị */}
-                                        <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs p-1 rounded flex items-center z-10">
-                                            <FontAwesomeIcon icon={faClock} className="mr-1 text-[10px]" />
-                                            {timeAgo(bds.createdAt)}
-                                        </div>
+                                        <FontAwesomeIcon
+                                            icon={faStar}
+                                            className="absolute text-yellow-700 text-l top-[35%] left-[32%]"
+                                        />
                                     </div>
-                                ) : (
-                                    <p>Không có hình ảnh.</p>
-                                )}
-                                {/* Vùng chứa thông tin */}
-                                <div className="mt-4 px-4">
-                                    <h3 className="font-bold text-blue-500">{bds.title}</h3>
-                                    <p>
-                                        <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
-                                        <span className="text-green-500">{bds.price.toLocaleString()} VND</span>
-                                    </p>
-                                    <p>
-                                        <FontAwesomeIcon icon={faRulerCombined} className="text-blue-500 mr-2" />
-                                        {bds.area} m²
-                                    </p>
-                                    <p>
-                                        <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500 mr-2" />
-                                        {bds.location}
-                                    </p>
+                                    {/* Ảnh */}
+                                    {bds.images && bds.images.length > 0 ? (
+                                        <div className="overflow-hidden relative">
+                                            <img
+                                                src={bds.images[0]}
+                                                alt={`Hình ảnh của ${bds.title}`}
+                                                className="rounded-lg w-full h-48 object-cover"
+                                            />
+                                            {/* Thời gian */}
+                                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs p-1 rounded flex items-center z-10">
+                                                <FontAwesomeIcon icon={faClock} className="mr-1 text-[10px]" />
+                                                {timeAgo(bds.createdAt, bds.updatedAt)}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p>Không có hình ảnh.</p>
+                                    )}
+                                    {/* Thông tin */}
+                                    <div className="mt-4 px-4">
+                                        <h3 className="font-bold text-blue-500">{bds.title}</h3>
+                                        <p>
+                                            <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
+                                            <span className="text-green-500">{bds.price.toLocaleString()} VND</span>
+                                        </p>
+                                        <p>
+                                            <FontAwesomeIcon icon={faRulerCombined} className="text-blue-500 mr-2" />
+                                            {bds.area} m²
+                                        </p>
+                                        <p>
+                                            <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500 mr-2" />
+                                            {bds.location}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))
                     ) : (
                         <p>Không có bất động sản nào.</p>
                     )}
                 </div>
             </div>
+
+
 
             <div className="mt-20 w-full max-w-screen-xl">
                 {/* Bất động sản đang bán */}
@@ -245,44 +269,46 @@ const Home = () => {
                 {bdsForSale.length > 0 ? (
                     <div className="flex flex-wrap justify-center gap-x-5 gap-y-6">
                         {displayedBdsForSale.map((bds) => (
-                            <div
-                                key={bds._id}
-                                className="p-0 border rounded-lg shadow transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-gray-500 w-[260px] relative"
+                            <Link
+                                to={`/bdsDetail/${bds._id}`}
+                                state={{ bds }}
                             >
-                                {/* Vùng chứa ảnh */}
-                                {bds.images && bds.images.length > 0 ? (
-                                    <div className="overflow-hidden relative">
-                                        <img
-                                            src={bds.images[0]}
-                                            alt={`Hình ảnh của ${bds.title}`}
-                                            className="rounded-lg w-full h-48 object-cover"
-                                        />
-                                        {/* Thời gian hiển thị */}
-                                        <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs p-1 rounded flex items-center z-10">
-                                            <FontAwesomeIcon icon={faClock} className="mr-1 text-[10px]" />
-                                            {timeAgo(bds.createdAt)}
+                                <div className="p-0 border rounded-lg shadow transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-gray-500 w-[260px] relative">
+                                    {/* Vùng chứa ảnh */}
+                                    {bds.images && bds.images.length > 0 ? (
+                                        <div className="overflow-hidden relative">
+                                            <img
+                                                src={bds.images[0]}
+                                                alt={`Hình ảnh của ${bds.title}`}
+                                                className="rounded-lg w-full h-48 object-cover"
+                                            />
+                                            {/* Thời gian hiển thị */}
+                                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs p-1 rounded flex items-center z-10">
+                                                <FontAwesomeIcon icon={faClock} className="mr-1 text-[10px]" />
+                                                {timeAgo(bds.createdAt, bds.updatedAt)}
+                                            </div>
                                         </div>
+                                    ) : (
+                                        <p>Không có hình ảnh.</p>
+                                    )}
+                                    {/* Vùng chứa thông tin */}
+                                    <div className="mt-4 px-4">
+                                        <h3 className="font-bold text-blue-500">{bds.title}</h3>
+                                        <p>
+                                            <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
+                                            <span className="text-green-500">{bds.price.toLocaleString()} VND</span>
+                                        </p>
+                                        <p>
+                                            <FontAwesomeIcon icon={faRulerCombined} className="text-blue-500 mr-2" />
+                                            {bds.area} m²
+                                        </p>
+                                        <p>
+                                            <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500 mr-2" />
+                                            {bds.location}
+                                        </p>
                                     </div>
-                                ) : (
-                                    <p>Không có hình ảnh.</p>
-                                )}
-                                {/* Vùng chứa thông tin */}
-                                <div className="mt-4 px-4">
-                                    <h3 className="font-bold text-blue-500">{bds.title}</h3>
-                                    <p>
-                                        <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
-                                        <span className="text-green-500">{bds.price.toLocaleString()} VND</span>
-                                    </p>
-                                    <p>
-                                        <FontAwesomeIcon icon={faRulerCombined} className="text-blue-500 mr-2" />
-                                        {bds.area} m²
-                                    </p>
-                                    <p>
-                                        <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500 mr-2" />
-                                        {bds.location}
-                                    </p>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 ) : (
@@ -310,50 +336,51 @@ const Home = () => {
                 {bdsForRent.length > 0 ? (
                     <div className="flex flex-wrap justify-center gap-x-5 gap-y-6">
                         {displayedBdsForRent.map((bds) => (
-                            <div
-                                key={bds._id}
-                                className="p-0 border rounded-lg shadow transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-gray-500 w-[260px] relative"
+                            <Link
+                                to={`/bdsDetail/${bds._id}`}
+                                state={{ bds }}
                             >
-                                {/* Vùng chứa ảnh */}
-                                {bds.images && bds.images.length > 0 ? (
-                                    <div className="overflow-hidden relative">
-                                        <img
-                                            src={bds.images[0]}
-                                            alt={`Hình ảnh của ${bds.title}`}
-                                            className="rounded-lg w-full h-48 object-cover"
-                                        />
-                                        {/* Thời gian hiển thị */}
-                                        <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs p-1 rounded flex items-center z-10">
-                                            <FontAwesomeIcon icon={faClock} className="mr-1 text-[10px]" />
-                                            {timeAgo(bds.createdAt)}
+                                <div className="p-0 border rounded-lg shadow transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-gray-500 w-[260px] relative">
+                                    {/* Vùng chứa ảnh */}
+                                    {bds.images && bds.images.length > 0 ? (
+                                        <div className="overflow-hidden relative">
+                                            <img
+                                                src={bds.images[0]}
+                                                alt={`Hình ảnh của ${bds.title}`}
+                                                className="rounded-lg w-full h-48 object-cover"
+                                            />
+                                            {/* Thời gian hiển thị */}
+                                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs p-1 rounded flex items-center z-10">
+                                                <FontAwesomeIcon icon={faClock} className="mr-1 text-[10px]" />
+                                                {timeAgo(bds.createdAt, bds.updatedAt)}
+                                            </div>
                                         </div>
+                                    ) : (
+                                        <p>Không có hình ảnh.</p>
+                                    )}
+                                    {/* Vùng chứa thông tin */}
+                                    <div className="mt-4 px-4">
+                                        <h3 className="text-blue-500 font-bold">{bds.title}</h3>
+                                        <p>
+                                            <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
+                                            <span className="text-green-500">{bds.price.toLocaleString()} VND</span>
+                                        </p>
+                                        <p>
+                                            <FontAwesomeIcon icon={faRulerCombined} className="text-blue-500 mr-2" />
+                                            {bds.area} m²
+                                        </p>
+                                        <p>
+                                            <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500 mr-2" />
+                                            {bds.location}
+                                        </p>
                                     </div>
-                                ) : (
-                                    <p>Không có hình ảnh.</p>
-                                )}
-                                {/* Vùng chứa thông tin */}
-                                <div className="mt-4 px-4">
-                                    <h3 className="text-blue-500 font-bold">{bds.title}</h3>
-                                    <p>
-                                        <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
-                                        <span className="text-green-500">{bds.price.toLocaleString()} VND</span>
-                                    </p>
-                                    <p>
-                                        <FontAwesomeIcon icon={faRulerCombined} className="text-blue-500 mr-2" />
-                                        {bds.area} m²
-                                    </p>
-                                    <p>
-                                        <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500 mr-2" />
-                                        {bds.location}
-                                    </p>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 ) : (
                     <p>Không có bất động sản nào.</p>
                 )}
-
                 {/* Bất động sản theo khu vực */}
                 <div className="mt-12 w-full bg-white p-6 rounded-lg shadow-lg">
                     <h3 className="text-xl font-bold mb-4">Bất động sản theo khu vực</h3>

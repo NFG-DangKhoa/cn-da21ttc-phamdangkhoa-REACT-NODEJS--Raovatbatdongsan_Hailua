@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 
 // Import routes
 const vnpayRoutes = require('./routes/VNPAY/vnpayRoutes');
+const emailRoutes = require('./routes/Gmail/emailRoutes');
 const authRoute = require('./routes/authRoutes');
 const bdsRoute = require('./routes/bdsRoutes');
 const imageRoute = require('./routes/imageRoutes'); // Cập nhật tên file route từ 'imageRoutes' thành 'imagesRoutes'
@@ -17,6 +18,7 @@ const buyerRoute = require('./routes/buyerRoutes'); // Cập nhật route Buyer
 const sellerbdsRoute = require('./routes/sellerbdsRoutes'); // Cập nhật route Seller
 const transactionRoute = require('./routes/transactionRoutes'); // Cập nhật route Transaction
 const statisticsRoutes = require('./routes/statistics');
+const FavoriteRoutes = require('./routes/FavoriteRoutes'); // Import routes
 
 const app = express();
 
@@ -37,6 +39,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Sử dụng các routes VNPAY
 app.use('/vnpay', vnpayRoutes);
 
+app.use('/api/email', emailRoutes);
+
 // Cấu hình phục vụ các file tĩnh từ thư mục public
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
@@ -54,6 +58,8 @@ app.use('/api/buyers', buyerRoute); // Thêm route Buyer
 app.use('/api/transactions', transactionRoute); // Thêm route Transaction
 app.use('/api/sellerbds', sellerbdsRoute); // Thêm routes sellerbds
 app.use('/api', statisticsRoutes);
+// Sử dụng favoriteRoutes để xử lý các yêu cầu liên quan đến yêu thích
+app.use('/api/favorites', FavoriteRoutes);
 
 
 

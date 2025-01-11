@@ -18,6 +18,7 @@ router.delete('/delete/:id', bdsController.deleteBDS);
 // Định nghĩa route để lấy số lượng bất động sản
 router.get('/count', bdsController.getBdsCount);
 
+router.get('/seller/:bds_id', bdsController.getSellerByBdsId);
 
 
 module.exports = router;

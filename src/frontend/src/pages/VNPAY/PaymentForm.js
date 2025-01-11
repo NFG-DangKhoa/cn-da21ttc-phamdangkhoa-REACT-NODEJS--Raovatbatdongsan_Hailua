@@ -18,11 +18,19 @@ const PaymentForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
+            // Bước 1: Gửi email
+            await axios.post("http://localhost:5000/vnpay/save_email", {
+                email: formData.email,
+            });
+
+            // Bước 2: Sau khi email đã được lưu, tạo URL thanh toán
             const response = await axios.post(
                 "http://localhost:5000/vnpay/create_payment_url",
                 formData
             );
+
             const { vnpUrl } = response.data;
             if (vnpUrl) {
                 window.location.href = vnpUrl; // Điều hướng đến URL VNPAY
@@ -40,10 +48,7 @@ const PaymentForm = () => {
             </h1>
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
-                    <label
-                        htmlFor="propertyName"
-                        className="block text-gray-700 font-medium"
-                    >
+                    <label htmlFor="propertyName" className="block text-gray-700 font-medium">
                         Tên bất động sản:
                     </label>
                     <input
@@ -57,10 +62,7 @@ const PaymentForm = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label
-                        htmlFor="traderName"
-                        className="block text-gray-700 font-medium"
-                    >
+                    <label htmlFor="traderName" className="block text-gray-700 font-medium">
                         Tên người giao dịch:
                     </label>
                     <input
